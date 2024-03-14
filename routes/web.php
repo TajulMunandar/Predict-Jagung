@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JagungController;
 use App\Http\Controllers\KecamatanController;
+use App\Http\Controllers\PrediksiController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,5 +34,6 @@ Route::prefix('/dashboard')->middleware('auth')->group(function () {
     Route::resource('/user', UserController::class);
     Route::resource('/kecamatan', KecamatanController::class);
     Route::resource('/produksi', JagungController::class);
+    Route::resource('/prediksi', PrediksiController::class);
     Route::put('/resetpassword/{user}', [UserController::class, 'resetPasswordAdmin'])->name('resetpassword.resetPasswordAdmin');
 });

@@ -35,7 +35,7 @@ class JagungController extends Controller
         try {
             $validatedData = $request->validate([
                 'kecamatan' => 'required',
-                'areaSawah' => 'required',
+                'areaLahan' => 'required',
                 'areaPanen' => 'required',
                 'priode' => 'required',
                 'totalProduktivitas' => 'required',
@@ -74,7 +74,7 @@ class JagungController extends Controller
         try {
             $rules = [
                 'kecamatan' => 'required',
-                'areaSawah' => 'required',
+                'areaLahan' => 'required',
                 'areaPanen' => 'required',
                 'priode' => 'required',
                 'totalProduktivitas' => 'required',

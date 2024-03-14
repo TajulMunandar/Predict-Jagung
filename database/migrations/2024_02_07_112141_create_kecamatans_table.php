@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('kecamatans', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->integer('luas');
+            $table->double('luas');
             $table->timestamps();
         });
     }

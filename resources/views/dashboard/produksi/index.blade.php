@@ -44,7 +44,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $produksi->Kecamatan->nama }}</td>
-                                    <td>{{ $produksi->areaSawah }} </td>
+                                    <td>{{ $produksi->areaLahan }} </td>
                                     <td>{{ $produksi->areaPanen }} </td>
                                     <td>{{ $produksi->priode }}</td>
                                     <td>{{ $produksi->totalProduktivitas }}</td>
@@ -92,13 +92,13 @@
                                                         </select>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label for="areaSawah" class="form-label">Area Sawah (ha)</label>
+                                                        <label for="areaLahan" class="form-label">Area Lahan (ha)</label>
                                                         <input type="number"
-                                                            class="form-control @error('areaSawah') is-invalid @enderror"
-                                                            id="areaSawah" name="areaSawah"
-                                                            value="{{ old('areaSawah', $produksi->areaSawah) }}" autofocus
+                                                            class="form-control @error('areaLahan') is-invalid @enderror"
+                                                            id="areaLahan" name="areaLahan"
+                                                            value="{{ old('areaLahan', $produksi->areaLahan) }}" autofocus
                                                             required>
-                                                        @error('areaSawah')
+                                                        @error('areaLahan')
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
                                                             </div>
@@ -231,11 +231,11 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="areaSawah" class="form-label">Area Sawah (ha)</label>
-                                <input type="number" class="form-control @error('areaSawah') is-invalid @enderror"
-                                    id="areaSawah" name="areaSawah" value="{{ old('areaSawah') }}"
+                                <label for="areaLahan" class="form-label">Area Lahan (ha)</label>
+                                <input type="number" class="form-control @error('areaLahan') is-invalid @enderror"
+                                    id="areaLahan" name="areaLahan" value="{{ old('areaLahan') }}"
                                     autofocus required>
-                                @error('areaSawah')
+                                @error('areaLahan')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>

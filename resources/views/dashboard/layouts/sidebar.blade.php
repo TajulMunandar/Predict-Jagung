@@ -16,8 +16,8 @@
             </a>
         </li>
 
-        <li class="menu-item {{ Request::is('dashboard/predict') ? 'active' : '' }}">
-            <a href="/dashboard" class="menu-link">
+        <li class="menu-item {{ Request::is('dashboard/prediksi') ? 'active' : '' }}">
+            <a href="/dashboard/prediksi" class="menu-link">
                 <i class="fa-solid fa-chart-mixed me-3"></i>
                 <div data-i18n="Analytics">Prediksi Jagung</div>
             </a>
