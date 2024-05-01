@@ -1,85 +1,106 @@
-# flask_app/app.py
 from flask import Flask, jsonify
 from flask_cors import CORS
+from fts import FTS
+from utils import mean_squared_error, average_forecasting_error_rate
 import requests
-import numpy as np
 import pandas as pd
-from skfuzzy import control as ctrl
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
 
 app = Flask(__name__)
-
 CORS(app)
 
-@app.route('/fuzzy', methods=['POST'])
-def fuzzy_predict():
-    laravel_api_url = 'http://127.0.0.1:8000/api/get-data'
+
+def getDataFromDatabase():
+    laravel_api_url = "http://127.0.0.1:8000/api/get-data"
+
     try:
         response = requests.get(laravel_api_url)
         response.raise_for_status()  # Membuat exception jika response status code bukan 200
-        jagung_data = response.json()
+        jagung_data = response.json()  # Mendapatkan respons JSON dari API
 
-        # Mengonversi data ke dalam format yang sesuai dengan yang diharapkan oleh model Fuzzy
-        df = pd.DataFrame(jagung_data)
-        df.dropna(inplace=True)
-
-        # Pisahkan data menjadi data latih dan data uji
-        X = df[['Area_Panen', 'Area_Lahan']]
-        y = df['Produksi']
-
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        # Fuzzifikasi variabel
-        luas_panen = ctrl.Antecedent(np.arange(0, 300, 1), 'area_panen')
-        luas_tanam = ctrl.Antecedent(np.arange(0, 300, 1), 'area_lahan')
-        produksi = ctrl.Consequent(np.arange(0, 15000, 1), 'produksi')
-
-        # Fungsi keanggotaan untuk setiap variabel
-        luas_panen.automf(3)
-        luas_tanam.automf(3)
-        produksi.automf(3)
-
-        # Aturan fuzzy
-        rule1 = ctrl.Rule(luas_panen['good'] & luas_tanam['good'], produksi['good'])
-        rule2 = ctrl.Rule(luas_panen['average'] & luas_tanam['average'], produksi['average'])
-        rule3 = ctrl.Rule(luas_panen['poor'] & luas_tanam['poor'], produksi['poor'])
-
-        # Buat sistem kontrol fuzzy
-        fuzzy_ctrl = ctrl.ControlSystem([rule1, rule2, rule3])
-        fuzzy_model = ctrl.ControlSystemSimulation(fuzzy_ctrl)
-
-        # Latih model
-        for index, row in X_train.iterrows():
-            fuzzy_model.input['area_panen'] = row['Area_Panen']
-            fuzzy_model.input['area_lahan'] = row['Area_Lahan']
-            fuzzy_model.compute()
-            fuzzy_model.output['produksi']
-
-        # Lakukan prediksi
-        predictions = []
-        for index, row in X_test.iterrows():
-            fuzzy_model.input['area_panen'] = row['Area_Panen']
-            fuzzy_model.input['area_lahan'] = row['Area_Lahan']
-            fuzzy_model.compute()
-            predictions.append(fuzzy_model.output['produksi'])
-
-        # Evaluasi model
-        mse = mean_squared_error(y_test, predictions)
-        print("Mean Squared Error:", mse)
-
-        # Plot hasil prediksi
-        tahun_test = X_test.index
-
-        hasil_prediksi = []
-        for tahun, prediksi in zip(tahun_test, predictions):
-            hasil_prediksi.append({"Tahun": tahun, "Prediksi": round(prediksi, 2)})
-
-        return jsonify({"Hasil_Prediksi": hasil_prediksi}), 200
+        return jagung_data
 
     except Exception as e:
         print("Error occurred while fetching or processing data:", e)
-        return jsonify({"message": "Error occurred while fetching or processing data"}), 500
+        return None
 
-if __name__ == '__main__':
+
+@app.route("/fuzzy", methods=["GET"])
+def predict():
+
+    jagungData = getDataFromDatabase()
+
+    dataset = []
+    for data in jagungData:
+        dataset.append(
+            {
+                "key": data["Tahun"],
+                "value": data["Produksi"],
+                "luas_tanam": data["Area_Lahan"],
+                "luas_panen": data["Area_Panen"],
+            }
+        )
+
+    min_val = min(v["value"] for v in dataset)
+    max_val = max(v["value"] for v in dataset)
+    min_border = min_val * 0.1
+    max_border = max_val * 0.1
+    luas_tanam = [
+        v["luas_tanam"] for v in dataset
+    ]  # Ambil nilai luas tanam dari dataset
+    luas_panen = [
+        v["luas_panen"] for v in dataset
+    ]  # Ambil nilai luas panen dari dataset
+    engine = FTS(
+        dataset,
+        luas_tanam,
+        luas_panen,  # Sertakan luas_tanam dan luas_panen
+        {
+            "minMargin": min_border,
+            "maxMargin": max_border,
+            "interval": (max_val * 1.1 - min_val * 0.9) / 10,
+        },
+    )
+    engine.train()
+    singleResult = engine.test()
+    forecasted = [v["predicted"] for v in singleResult[:-1]]
+    actual = [v["value"] for v in singleResult[1:]]
+    mse = mean_squared_error(actual, forecasted)
+    afer = average_forecasting_error_rate(actual, forecasted)
+    print(singleResult)
+    print({"mse": mse, "afer": afer})
+
+    latest_data = dataset[-1]
+    latest_value = latest_data["value"]
+
+    forecasted_values = []
+    for i in range(1, 6):
+        # Lakukan prediksi dengan menggunakan pola historis dari data terakhir
+        forecasted_value = latest_value + (latest_value - dataset[-2]["value"])
+        forecasted_values.append(forecasted_value)
+        # Perbarui nilai terbaru untuk iterasi berikutnya
+        latest_value = forecasted_value
+
+    prediction_results = []
+    for i, value in enumerate(forecasted_values, start=1):
+        prediction_results.append({"Tahun": f"Tahun {2022 + i}", "Prediksi": value})
+
+    # Data metrik evaluasi
+    evaluation_metrics = {"mse": mse, "afer": afer}
+    mse_percentage = mse * 100
+    afer_percentage = afer * 100
+
+    # Mengembalikan response JSON
+    response_data = {
+        "data_train": singleResult,
+        "prediction_results": prediction_results,
+        "evaluation_metrics": {
+            "mse": f"{mse_percentage:.2f}%",
+            "afer": f"{afer_percentage:.2f}%",
+        },
+    }
+
+    return jsonify(response_data)
+
+
+if __name__ == "__main__":
     app.run(debug=True)

@@ -9,24 +9,26 @@ class PrediksiController extends Controller
 {
     public function index()
     {
-        $title = 'Data Prediksi';
+        $title = 'Prediksi';
         return view('dashboard.prediksi.index')->with(compact('title')); //
     }
 
     public function getData()
     {
         // Mengambil semua data produk dari database
-        $perPeriode = Jagung::selectRaw('priode, SUM(totalProduksi) as totalProduksiPerPeriode, SUM(areaLahan) as totalLahanPerPeriode, SUM(areaPanen) as totalPanenPerPeriode')
-            ->groupBy('priode')
+        $perPeriode = Jagung::select('priode', 'totalProduksi', 'areaLahan', 'areaPanen')
+            ->orderBy('priode', 'asc')
             ->get();
+
 
         // Mengonversi data produk ke dalam format yang dapat digunakan oleh Python
         $jagungData = [];
         foreach ($perPeriode as $jagung) {
             $jagungData[] = [
-                'Produksi' => $jagung->totalProduksiPerPeriode,
-                'Area_Lahan' => $jagung->totalLahanPerPeriode,
-                'Area_Panen' => $jagung->totalPanenPerPeriode,
+                'Tahun' => $jagung->priode,
+                'Produksi' => $jagung->totalProduksi,
+                'Area_Lahan' => $jagung->areaLahan,
+                'Area_Panen' => $jagung->areaPanen,
             ];
         }
 
