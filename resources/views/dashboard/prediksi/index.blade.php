@@ -18,7 +18,7 @@
     </div>
 
     <button class="btn btn-primary fs-5 fw-normal mt-2" id="predict"><i
-            class="fa-solid fa-magnifying-glass fs-5 me-2"></i>Predikisi</button>
+            class="fa-solid fa-magnifying-glass fs-5 me-2"></i>Prediksi</button>
     <div class="row mt-3">
         <div class="col">
             <h4>Data Prediksi</h4>
@@ -27,7 +27,7 @@
             <h5><b>MAPE : <span id="mape"></span></b></h5>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
             <div class="card mt-2">
                 <div class="card-body">
@@ -48,25 +48,12 @@
             </div>
         </div>
     </div>
-    <div class="row mt-3">
-        <h4>Data Train</h4>
+    <h4>Grafik</h4>
+    <div class="row">
         <div class="col">
-            <div class="card mt-2">
+            <div class="card">
                 <div class="card-body">
-                    <table id="myTable" class="table responsive nowrap table-bordered table-striped align-middle"
-                        style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>NO</th>
-                                <th>Tahun</th>
-                                <th>Prediksi</th>
-                                <th>Data Real</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody2">
-
-                        </tbody>
-                    </table>
+                    <canvas id="myChart"></canvas>
                 </div>
             </div>
         </div>
@@ -90,7 +77,6 @@
 
             if (data) {
                 const hasilPrediksi = data.prediction_results;
-                const dataTrain = data.data_train;
                 let tbody = '';
                 // Iterasi melalui objek data dan buat baris HTML untuk setiap entri
                 hasilPrediksi.forEach((item, index) => {
@@ -102,21 +88,55 @@
                     </tr>`;
                 });
                 $('#tbody').html(tbody);
-                let tbody2 = '';
-                // Iterasi melalui objek data dan buat baris HTML untuk setiap entri
-                dataTrain.forEach((item, index) => {
-                    tbody2 += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.key}</td>
-                        <td>${item.predicted}</td>
-                        <td>${item.value}</td>
-                    </tr>`;
-                });
-                $('#tbody2').html(tbody2);
 
                 const mape = data.evaluation_metrics.afer;
                 document.getElementById('mape').innerText = mape;
+
+                const ctx = document.getElementById('myChart');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: hasilPrediksi.map(item => item.Tahun),
+                        datasets: [{
+                            label: 'Produksi',
+                            borderColor: "#8f44fd",
+                            backgroundColor: "#8f44fd",
+                            data: hasilPrediksi.map(item => item.Prediksi),
+                            fill: true,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                suggestedMin: 0,
+                                suggestedMax: 50,
+                                grid: {
+                                    display: true,
+                                    drawBorder: true,
+                                    drawOnChartArea: true,
+                                    drawTicks: true,
+                                    color: "rgba(255, 255, 255, 0.08)",
+                                    borderColor: "transparent",
+                                    borderDash: [5, 5],
+                                    borderDashOffset: 2,
+                                    tickColor: "transparent"
+                                },
+                                beginAtZero: true
+                            }
+                        },
+                        tension: 0.3,
+                        elements: {
+                            point: {
+                                radius: 8,
+                                hoverRadius: 12,
+                                backgroundColor: "#9BD0F5",
+                                borderWidth: 0,
+                            },
+                        },
+                    }
+                });
             } else {
                 console.log('Failed to retrieve product data');
             }

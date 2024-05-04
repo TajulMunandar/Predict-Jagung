@@ -39,7 +39,6 @@ def predict():
                 "luas_panen": data["Area_Panen"],
             }
         )
-
     min_val = min(v["value"] for v in dataset)
     max_val = max(v["value"] for v in dataset)
     min_border = min_val * 0.1

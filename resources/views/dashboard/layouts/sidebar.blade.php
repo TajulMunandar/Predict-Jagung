@@ -28,30 +28,33 @@
             <hr>
         </li>
 
-        <li class="menu-item">
-            <p class="menu-link">Master Data</p>
-        </li>
+        @if (auth()->user()->role != 2)
+            <li class="menu-item">
+                <p class="menu-link">Master Data</p>
+            </li>
 
-        <li class="menu-item {{ Request::is('dashboard/produksi*') ? 'active' : '' }}">
-            <a href="/dashboard/produksi" class="menu-link">
-                <i class="fa-duotone fa-industry-windows me-3"></i>
-                <div data-i18n="Analytics">Produksi</div>
-            </a>
-        </li>
+            <li class="menu-item {{ Request::is('dashboard/produksi*') ? 'active' : '' }}">
+                <a href="/dashboard/produksi" class="menu-link">
+                    <i class="fa-duotone fa-industry-windows me-3"></i>
+                    <div data-i18n="Analytics">Produksi</div>
+                </a>
+            </li>
 
-        <li class="menu-item {{ Request::is('dashboard/kecamatan*') ? 'active' : '' }}">
-            <a href="/dashboard/kecamatan" class="menu-link">
-                <i class="fa-duotone fa-map-location-dot me-3"></i>
-                <div data-i18n="Analytics">Kecamatan</div>
-            </a>
-        </li>
+            <li class="menu-item {{ Request::is('dashboard/kecamatan*') ? 'active' : '' }}">
+                <a href="/dashboard/kecamatan" class="menu-link">
+                    <i class="fa-duotone fa-map-location-dot me-3"></i>
+                    <div data-i18n="Analytics">Kecamatan</div>
+                </a>
+            </li>
 
-        <li class="menu-item {{ Request::is('dashboard/user*') ? 'active' : '' }}">
-            <a href="/dashboard/user" class="menu-link">
-                <i class="fa-duotone fa-users me-3"></i>
-                <div data-i18n="Analytics">User</div>
-            </a>
-        </li>
+            <li class="menu-item {{ Request::is('dashboard/user*') ? 'active' : '' }}">
+                <a href="/dashboard/user" class="menu-link">
+                    <i class="fa-duotone fa-users me-3"></i>
+                    <div data-i18n="Analytics">User</div>
+                </a>
+            </li>
+        @endif
+
 
     </ul>
 </aside>

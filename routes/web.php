@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JagungController;
 use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\PrediksiController;
+use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,13 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
     Route::post('/logout', 'logout');
 });
+
+Route::controller(RegisterController::class)->group(function () {
+    Route::get('/register', 'index')->name('register')->middleware('guest');
+    Route::post('/register', 'store');
+});
+
+
 
 Route::prefix('/dashboard')->middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
