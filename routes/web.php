@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect('/dashboard');
+    return view('landing');
 });
 
 Route::controller(AuthController::class)->group(function () {
