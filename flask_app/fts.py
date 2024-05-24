@@ -86,7 +86,9 @@ class FTS:
 
             self._ruleset[precedent].add((consequent, luas_tanam, luas_panen))
 
-    def test(self, options: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+    def test(
+        self, options: Dict[str, Any] = None, years_to_predict: int = 0
+    ) -> List[Dict[str, Any]]:
         base_data = (
             options["dataset"] if options and "dataset" in options else self._dataset
         )
@@ -135,4 +137,39 @@ class FTS:
             previous_luas_tanam = luas_tanam
             previous_luas_panen = luas_panen
 
+        if years_to_predict > 0:
+            latest_data = base_data[-1]
+            latest_key = int(latest_data["key"])
+            for i in range(1, years_to_predict + 1):
+                predicted_value = self._predict_next(latest_data)
+                predicted.append(
+                    {"key": latest_key + i, "value": None, "predicted": predicted_value}
+                )
+                latest_data = {
+                    "key": latest_key + i,
+                    "value": predicted_value,
+                    "luas_tanam": latest_data["luas_tanam"],
+                    "luas_panen": latest_data["luas_panen"],
+                }
+
         return predicted
+
+    def _predict_next(self, latest_data: Dict[str, Any]) -> float:
+        value = latest_data["value"]
+        partition_index = self.nearest_partition(value)
+        partition_consequent = self._ruleset.get(partition_index, set())
+        predicted_value = 0
+
+        if len(partition_consequent) == 0:
+            predicted_value = self._partition_ref[partition_index].median
+        else:
+            total_weighted_sum = sum(
+                self._partition_ref[x[0]].median * (x[1] + x[2]) / 2
+                for x in partition_consequent
+            )
+            total_weight = sum((x[1] + x[2]) / 2 for x in partition_consequent)
+            predicted_value += (
+                total_weighted_sum / total_weight if total_weight != 0 else 0
+            )
+
+        return predicted_value

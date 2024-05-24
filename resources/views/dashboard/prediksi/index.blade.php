@@ -83,26 +83,32 @@
                     tbody += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${item.Tahun}</td>
-                        <td>${item.Prediksi}</td>
+                        <td>${item.key}</td>
+                        <td>${item.predicted}</td>
                     </tr>`;
                 });
                 $('#tbody').html(tbody);
 
                 const mape = data.evaluation_metrics.afer;
-                document.getElementById('mape').innerText = mape;
+                const mapeAsNumber = parseFloat(mape);
+
+                // Mengambil empat angka setelah titik desimal
+                const mapeFormatted = mapeAsNumber.toFixed(2);
+
+                // Menampilkan nilai mape yang sudah diformat di dalam elemen HTML dengan ID 'mape'
+                document.getElementById('mape').innerText = mapeFormatted;
 
                 const ctx = document.getElementById('myChart');
 
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: hasilPrediksi.map(item => item.Tahun),
+                        labels: hasilPrediksi.map(item => item.key),
                         datasets: [{
                             label: 'Produksi',
                             borderColor: "#8f44fd",
                             backgroundColor: "#8f44fd",
-                            data: hasilPrediksi.map(item => item.Prediksi),
+                            data: hasilPrediksi.map(item => item.predicted),
                             fill: true,
                             borderWidth: 1
                         }]
