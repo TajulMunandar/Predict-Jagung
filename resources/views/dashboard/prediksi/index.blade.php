@@ -37,7 +37,8 @@
                             <tr>
                                 <th>NO</th>
                                 <th>Tahun</th>
-                                <th>Produksi</th>
+                                <th>Prediksi Produksi</th>
+                                <th>Produksi Actual</th>
                             </tr>
                         </thead>
                         <tbody id="tbody">
@@ -76,15 +77,27 @@
             console.log(data)
 
             if (data) {
-                const hasilPrediksi = data.prediction_results;
+                const hasilPrediksi = data.data_train;
+                const hasilPrediksi2 = data.prediction_results;
                 let tbody = '';
                 // Iterasi melalui objek data dan buat baris HTML untuk setiap entri
                 hasilPrediksi.forEach((item, index) => {
                     tbody += `
                     <tr>
                         <td>${index + 1}</td>
+                        <td>${item.key}</td>
+                        <td>${item.predicted}</td>
+                        <td>${item.value}</td>
+                    </tr>`;
+                });
+                $('#tbody').html(tbody);
+                hasilPrediksi2.forEach((item, index) => {
+                    tbody += `
+                    <tr>
+                        <td>${index + 18}</td>
                         <td>${item.Tahun}</td>
                         <td>${item.Prediksi}</td>
+                        <td>null</td>
                     </tr>`;
                 });
                 $('#tbody').html(tbody);
@@ -103,12 +116,12 @@
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: hasilPrediksi.map(item => item.Tahun),
+                        labels: hasilPrediksi.map(item => item.key),
                         datasets: [{
                             label: 'Produksi',
                             borderColor: "#8f44fd",
                             backgroundColor: "#8f44fd",
-                            data: hasilPrediksi.map(item => item.Prediksi),
+                            data: hasilPrediksi.map(item => item.predicted),
                             fill: true,
                             borderWidth: 1
                         }]

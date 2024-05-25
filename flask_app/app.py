@@ -61,22 +61,20 @@ def predict():
     )
     engine.train()
     singleResult = engine.test()
-    forecasted = [v["predicted"] for v in singleResult]
-    actual = [v["value"] for v in singleResult]
+    forecasted = [v["predicted"] for v in singleResult[:-1]]
+    actual = [v["value"] for v in singleResult[1:]]
     mse = mean_squared_error(actual, forecasted)
     afer = average_forecasting_error_rate(actual, forecasted)
     print(singleResult)
     print({"mse": mse, "afer": afer})
 
-    latest_data = dataset[-2]
-    latest_key = latest_data["key"]
+    latest_data = dataset[-1]
     latest_value = latest_data["value"]
+
     forecasted_values = []
     for i in range(1, 6):
         # Lakukan prediksi dengan menggunakan pola historis dari data terakhir
-        forecasted_value = engine.test(
-            [{"key": latest_key + str(i), "value": latest_value}]
-        )[0]["predicted"]
+        forecasted_value = latest_value + (latest_value - dataset[-2]["value"])
         forecasted_values.append(forecasted_value)
         # Perbarui nilai terbaru untuk iterasi berikutnya
         latest_value = forecasted_value
