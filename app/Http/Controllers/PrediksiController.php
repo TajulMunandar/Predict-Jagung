@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Jagung;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PrediksiController extends Controller
 {
@@ -16,7 +17,13 @@ class PrediksiController extends Controller
     public function getData()
     {
         // Mengambil semua data produk dari database
-        $perPeriode = Jagung::select('priode', 'totalProduksi', 'areaLahan', 'areaPanen')
+        $perPeriode = Jagung::select(
+            'priode',
+            DB::raw('SUM(totalProduksi) as totalProduksi'),
+            DB::raw('SUM(areaLahan) as areaLahan'),
+            DB::raw('SUM(areaPanen) as areaPanen')
+        )
+            ->groupBy('priode')
             ->orderBy('priode', 'asc')
             ->get();
 
