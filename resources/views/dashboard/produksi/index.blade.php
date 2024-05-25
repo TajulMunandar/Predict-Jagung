@@ -31,7 +31,7 @@
                             <tr>
                                 <th>NO</th>
                                 <th>KECAMATAN</th>
-                                <th>AREA SAWAH (ha)</th>
+                                <th>AREA LAHAN (ha)</th>
                                 <th>AREA PANEN (ha)</th>
                                 <th>PRIODE</th>
                                 <th>TOTAL PRODUKTIVITAS</th>
