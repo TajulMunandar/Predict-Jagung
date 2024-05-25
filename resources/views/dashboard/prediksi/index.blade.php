@@ -83,8 +83,8 @@
                     tbody += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${item.key}</td>
-                        <td>${item.predicted}</td>
+                        <td>${item.Tahun}</td>
+                        <td>${item.Prediksi}</td>
                     </tr>`;
                 });
                 $('#tbody').html(tbody);
@@ -96,19 +96,19 @@
                 const mapeFormatted = mapeAsNumber.toFixed(2);
 
                 // Menampilkan nilai mape yang sudah diformat di dalam elemen HTML dengan ID 'mape'
-                document.getElementById('mape').innerText = mapeFormatted;
+                document.getElementById('mape').innerText = mapeFormatted + "%";
 
                 const ctx = document.getElementById('myChart');
 
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: hasilPrediksi.map(item => item.key),
+                        labels: hasilPrediksi.map(item => item.Tahun),
                         datasets: [{
                             label: 'Produksi',
                             borderColor: "#8f44fd",
                             backgroundColor: "#8f44fd",
-                            data: hasilPrediksi.map(item => item.predicted),
+                            data: hasilPrediksi.map(item => item.Prediksi),
                             fill: true,
                             borderWidth: 1
                         }]
