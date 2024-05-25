@@ -32,6 +32,7 @@ class PrediksiController extends Controller
             ];
         }
 
+
         return response()->json($jagungData);
     }
 }

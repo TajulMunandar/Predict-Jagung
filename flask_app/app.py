@@ -61,15 +61,27 @@ def predict():
     )
     engine.train()
     singleResult = engine.test()
-
     forecasted = [v["predicted"] for v in singleResult[:-1]]
     actual = [v["value"] for v in singleResult[1:]]
     mse = mean_squared_error(actual, forecasted)
     afer = average_forecasting_error_rate(actual, forecasted)
-    print(singleResult)
+    # print(singleResult)
     print({"mse": mse, "afer": afer})
 
-    prediction_results = engine.test(years_to_predict=1)
+    latest_data = dataset[-1]
+    latest_value = latest_data["value"]
+
+    forecasted_values = []
+    for i in range(1, 6):
+        # Lakukan prediksi dengan menggunakan pola historis dari data terakhir
+        forecasted_value = latest_value + (latest_value - dataset[-2]["value"])
+        forecasted_values.append(forecasted_value)
+        # Perbarui nilai terbaru untuk iterasi berikutnya
+        latest_value = forecasted_value
+
+    prediction_results = []
+    for i, value in enumerate(forecasted_values, start=0):
+        prediction_results.append({"Tahun": f"Tahun {2019 + i}", "Prediksi": value})
 
     # Data metrik evaluasi
     evaluation_metrics = {"mse": mse, "afer": afer}
