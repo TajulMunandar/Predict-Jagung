@@ -52,7 +52,7 @@ def predict():
     engine = FTS(
         dataset,
         luas_tanam,
-        luas_panen,  # Sertakan luas_tanam dan luas_panen
+        luas_panen,
         {
             "minMargin": min_border,
             "maxMargin": max_border,
@@ -65,8 +65,8 @@ def predict():
     actual = [v["value"] for v in singleResult[1:]]
     mse = mean_squared_error(actual, forecasted)
     afer = average_forecasting_error_rate(actual, forecasted)
-    print(singleResult)
-    print({"mse": mse, "afer": afer})
+    # print(singleResult)
+    # print({"mse": mse, "afer": afer})
 
     latest_data = dataset[-1]
     latest_value = latest_data["value"]
@@ -93,7 +93,7 @@ def predict():
         "data_train": singleResult,
         "prediction_results": prediction_results[-5:],
         "evaluation_metrics": {
-            "mse": f"{mse_percentage:.2f}%",
+            "mse": mse,
             "afer": afer_percentage,
         },
     }

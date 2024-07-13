@@ -1,6 +1,5 @@
 import math
 
-
 def base_lookup(interval):
     return 0.1 if interval <= 0.1 else 10 ** math.ceil(math.log10(interval) - 1)
 
