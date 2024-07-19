@@ -49,12 +49,22 @@
             </div>
         </div>
     </div>
-    <h4>Grafik</h4>
+    <h4>Grafik Predict</h4>
     <div class="row">
         <div class="col">
             <div class="card">
                 <div class="card-body">
                     <canvas id="myChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h4 class="mt-3">Grafik Actual</h4>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="myChart2"></canvas>
                 </div>
             </div>
         </div>
@@ -79,6 +89,7 @@
             if (data) {
                 const hasilPrediksi = data.data_train;
                 const hasilPrediksi2 = data.prediction_results;
+                const actual = data.data_train;
                 let tbody = '';
                 // Iterasi melalui objek data dan buat baris HTML untuk setiap entri
                 hasilPrediksi.forEach((item, index) => {
@@ -122,6 +133,52 @@
                             borderColor: "#8f44fd",
                             backgroundColor: "#8f44fd",
                             data: hasilPrediksi.map(item => item.predicted),
+                            fill: true,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                suggestedMin: 0,
+                                suggestedMax: 50,
+                                grid: {
+                                    display: true,
+                                    drawBorder: true,
+                                    drawOnChartArea: true,
+                                    drawTicks: true,
+                                    color: "rgba(255, 255, 255, 0.08)",
+                                    borderColor: "transparent",
+                                    borderDash: [5, 5],
+                                    borderDashOffset: 2,
+                                    tickColor: "transparent"
+                                },
+                                beginAtZero: true
+                            }
+                        },
+                        tension: 0.3,
+                        elements: {
+                            point: {
+                                radius: 8,
+                                hoverRadius: 12,
+                                backgroundColor: "#9BD0F5",
+                                borderWidth: 0,
+                            },
+                        },
+                    }
+                });
+
+                const ctx2 = document.getElementById('myChart2');
+
+                new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: actual.map(item => item.key),
+                        datasets: [{
+                            label: 'Produksi',
+                            borderColor: "#8f44fd",
+                            backgroundColor: "#8f44fd",
+                            data: actual.map(item => item.value),
                             fill: true,
                             borderWidth: 1
                         }]
